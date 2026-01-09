@@ -79,7 +79,7 @@ class TTS:
         audio_int16 = np.clip(audio_data * 32767.0, -32767.0, 32767.0).astype(np.int16)
 
 
-        chunk_size = 1024
+        chunk_size = 4096
         idx = 0
         total_frames = len(audio_int16)
 
