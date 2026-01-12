@@ -21,7 +21,7 @@ GPU_LAYERS_LLM = 0 #How many layers your model is going to use in GPU, for CPU u
 CHAT_FORMAT_LLM = "chatml-function-calling" #NOT recommended to change unless you change the model
 
 """Information - data"""
-FUZZY_LOGIC_ACCURACY_GENERAL_RAG = 0.60 # Configure the priority of LLM over the RAG
+FUZZY_LOGIC_ACCURACY_GENERAL_RAG = 0.70 # Configure the priority of LLM over the RAG
 PATH_GENERAL_RAG = "config/data/general_rag.json"
 
 """Text-to-Speech"""
@@ -34,11 +34,12 @@ NAME_OF_OUTS_TTS = "test" #This is the name that your file is going to revive Ex
 SAVE_WAV_TTS = False
 
 """Speech-to-Text"""
+DEVICE_SELECTOR_STT = "cpu" # "cpu" or "cuda"
 SAMPLE_RATE_STT = 16000 #Whisper works at this sample_rate doesn't change unless it is necessary
 #IMPORTANT the system is prepare to work without this variable, but we have it for noisy environments, as a protection method
 LISTEN_SECONDS_STT = 5.0 #The time of the phrase that the tts is going to be active after de wake_word detection
 MIN_SILENCE_MS_TO_DRAIN_STT = 100 # 1s of time required to drain the buffer. Its divided by 10 because we sample at 10ms
-SELF_VOCABULARY_STT = "Octybot, ve a la enfermería, DatIA Demographics" 
+SELF_VOCABULARY_STT = "DatIA Demographics" 
 
 """Wake-Word"""
 ACTIVATION_PHRASE_WAKE_WORD = "ok robot" #The Activation Word that the model is going to detect

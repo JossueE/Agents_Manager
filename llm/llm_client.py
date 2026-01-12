@@ -56,9 +56,10 @@ class LLM:
         with self._lock:
             out = self._llm.create_chat_completion(
                 messages=messages,
-                temperature=0.2,
+                temperature=0.4,
                 top_p=0.9,
-                max_tokens=100,
+                max_tokens=120,
+                repeat_penalty=1.1,
             )
         msg = out["choices"][0]["message"]
         return (msg.get("content") or "").strip() or "No tengo una respuesta."

@@ -1,4 +1,3 @@
-
 from typing import Optional
 from pathlib import Path
 
@@ -6,7 +5,7 @@ import logging
 import numpy as np
 
 import whisper
-from config.settings  import SAMPLE_RATE_STT, LANGUAGE, SELF_VOCABULARY_STT
+from config.settings  import SAMPLE_RATE_STT, LANGUAGE, SELF_VOCABULARY_STT, DEVICE_SELECTOR_STT
 
 class SpeechToText:
     def __init__(self, model_path:str, model_name:str) -> None:
@@ -15,7 +14,7 @@ class SpeechToText:
 
         model_path = Path(model_path)
 
-        self.model = whisper.load_model(model_name, download_root = model_path.parent)
+        self.model = whisper.load_model(model_name, download_root = model_path.parent, device=DEVICE_SELECTOR_STT)
 
     
     def worker_loop(self, audio_bytes: bytes) -> Optional[str | None]:
@@ -25,10 +24,10 @@ class SpeechToText:
         try:
             text = self.stt_from_bytes(audio_bytes)
             if text:  
-                self.log.info(f"📝 {text}")
+                self.log.info(f"Se transcribió = {text}")
                 return text
             else:
-                self.log.info(f"📝 (vacío)")
+                self.log.info(f"Transcripción vacía")
                 return None
             
         except Exception as e:
@@ -84,7 +83,7 @@ if __name__ == "__main__":
     audio_listener.start_stream()
     
     try:
-        print("Este es el nodo de prueba del Speech to Text con Audio Listener y Wake Word 🔊\n" \
+        print("Este es el nodo de prueba del Speech to Text con Audio Listener y Wake Word \n" \
         "Debes decir La Palabara de activación, es 'ok Robot' - Presione Ctrl+C para salir\n")
         while True:
             result = audio_listener.read_frame(ww.frame_samples)
