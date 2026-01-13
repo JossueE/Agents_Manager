@@ -16,8 +16,9 @@ class SpeechToText:
         model_path = Path(model_path)
 
         self.model = whisper.load_model(model_name, download_root = model_path.parent, device=DEVICE_SELECTOR_STT)
-
-        # List of Whisper common hallucinations
+        
+        
+        # Common Whisper hallucinations to filter out
         self.hallucinations = [
             "la universidad",
             "subtítulos realizados por",
@@ -29,8 +30,7 @@ class SpeechToText:
             "copyright",
             "todos los derechos reservados",
             "hacé clic en el botón",
-            "regístrate",
-            "No me puedo hablar de lo que es"
+            "regístrate"
         ]
 
     
@@ -41,33 +41,39 @@ class SpeechToText:
         try:
             text = self.stt_from_bytes(audio_bytes)
             if text:
-                if self.check_hallucinations(text):
-                    self.log.warning(f"Hallucination detected: '{text}'. Triggering retry")
-                    return "**error_audio_retry**" # Key for RAG
-                
+                # Check for Hallucinations
+                if self.check_hallucination(text):
+                    self.log.warning(f"Hallucination detected: '{text}'. Triggering retry.")
+                    return "**error_audio_retry**" # Magic Key for RAG
+
                 self.log.info(f"Se transcribió = {text}")
                 return text
             else:
-                self.log.info(f"Transcripción vacía")
-                return None
+                # Handle Empty Transcription (Audio detected but no words found)
+                self.log.info(f"Transcripción vacía. Triggering retry.")
+                return "**error_audio_retry**" 
             
         except Exception as e:
-            self.log.info(f"Error en STT: {e}")
+            self.log.error(f"Error en STT: {e}")
+            return None
 
 
-    def check_hallucinations(self, text: str) -> bool:
+    def check_hallucination(self, text: str) -> bool:
         """
         Verify if the text is a valid transcription or a hallucination.
         Uses a combination of substring presence and fuzzy matching ratio.
         """
         text_lower = text.lower().strip()
-
+        
         for h in self.hallucinations:
+            # Check if the hallucination phrase exists in the text
             if h in text_lower:
                 # Calculate similarity ratio
                 ratio = SequenceMatcher(None, h, text_lower).ratio()
+                
+                # If high match (> 0.6) or if it's a repetitive loop (length check)
                 if ratio > 0.6 or (len(text_lower) > len(h) * 1.5):
-                    return True
+                     return True
         return False
 
 
@@ -85,7 +91,7 @@ class SpeechToText:
         x = pcm.astype(np.float32) / 32768.0
 
         if SAMPLE_RATE_STT != 16000:
-            self.log.info(f"Whisper Solo Funciona a 16 Khz, estás enviando información a {SAMPLE_RATE_STT}hz")
+            self.log.warning(f"Whisper Solo Funciona a 16 Khz, estás enviando información a {SAMPLE_RATE_STT}hz")
 
         result = self.model.transcribe(
             x,
@@ -133,4 +139,3 @@ if __name__ == "__main__":
         audio_listener.terminate()
         print("Saliendo")
         exit(0)
-
