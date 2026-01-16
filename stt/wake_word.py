@@ -99,7 +99,7 @@ class WakeWord:
             result = json.loads(self.rec.Result() or "{}")
             text = (result.get("text") or "").lower().strip()
             if text and self.matches_wake(text):
-                self.log.info(f"Wake word detected: '{text}' 🎤")
+                self.log.info(f"Wake word detected: '{text}'")
                 if not self.listening_confirm:           
                     self.listening_confirm = True
                     self.listening = True   

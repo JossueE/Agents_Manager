@@ -24,12 +24,12 @@ LEVEL_COLORS = {
 # Module Colors (To differentiate sources)
 MODULE_COLORS = {
     "Octybot": "\033[95m",        # Magenta
-    "Wake_Word": "\033[96m",      # Cyan
+    "Wake_Word": "\033[93m",      # Yellow
     "Speech_To_Text": "\033[94m", # Blue
-    "LLM": "\033[93m",            # Yellow
+    "LLM": "\033[96m",            # Cyan
+    "llm_data": "\033[36m",       # Cyan dim
     "Text-to-Speech": "\033[92m", # Green
     "AudioListener": "\033[90m",  # Grey
-    "llm_data": "\033[36m"        # Cyan dim
 }
 
 class ColoredFormatter(logging.Formatter):
