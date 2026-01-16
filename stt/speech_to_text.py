@@ -13,7 +13,7 @@ from config.settings  import (
 class SpeechToText:
     def __init__(self, model_path:str, model_name:str) -> None:
         
-        self.log = logging.getLogger("Speech_To_Text")    
+        self.log = logging.getLogger("STT")    
 
         model_path = Path(model_path)
 

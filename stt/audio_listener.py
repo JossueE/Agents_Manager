@@ -42,12 +42,12 @@ def define_device_id(pa:pyaudio.PyAudio = None, preferred:int = AUDIO_LISTENER_D
             if info.get('maxInputChannels', 0) > 0:
                 log.info(f"[{i}] {info['name']} (in={info['maxInputChannels']}, rate={int(info.get('defaultSampleRate',0))})")
                 if info['name'].lower() == "pulse":
-                    log.warning(f"[AudioListener - utils]Usando dispositivo PulseAudio por defecto: {i}")
+                    log.warning(f"[Audio_Listener - utils]Usando dispositivo PulseAudio por defecto: {i}")
                     return i
 
 class AudioListener:
     def __init__(self):
-        self.log = logging.getLogger("AudioListener")  
+        self.log = logging.getLogger("Audio_Listener")  
         self.sample_rate = AUDIO_LISTENER_SAMPLE_RATE
         
         # --- UPDATE THIS BLOCK ---

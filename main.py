@@ -10,7 +10,7 @@ from tts.text_to_speech import TTS
 class OctybotAgent:
     def __init__(self):
         configure_logging() # <--- Initialize color logging
-        self.log = logging.getLogger("Octybot")
+        self.log = logging.getLogger("System")
         model = LoadModel()
         
         #Speech-to-Text

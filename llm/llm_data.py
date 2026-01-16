@@ -10,7 +10,7 @@ from llm.llm_intentions import norm_text
 
 class GENERAL_RAG:
     def __init__(self, path: str):
-        self.log = logging.getLogger("llm_data")
+        self.log = logging.getLogger("LLM_Data")
         self.items: List[Dict[str,str]] = []
         self.load(path)
     
