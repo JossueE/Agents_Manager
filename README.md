@@ -42,7 +42,9 @@ cd agents_manager
 
 ```bash
 bash installer.sh
-```
+``` 
+> [!NOTE]
+> The installer also is going to download the [Local-LLM](https://github.com/JossueE/Local-LLM)
 
 #### For manual installation and setup:
 
@@ -75,8 +77,13 @@ To verify models were correctly downloaded or to download models:
 ```bash
 .venv/bin/python utils/download.py
 ```
-
 The script installs everything into your cache directory (`~/.cache/agents_manager`).
+
+```bash
+# To install the Local-LLM module
+cd 
+git clone https://github.com/JossueE/Local-LLM
+```
 
 ---
 
