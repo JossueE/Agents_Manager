@@ -1,4 +1,4 @@
-
+config/settings.yml
 **/tts/audios
 .vscode/
 *.pyc
