@@ -16,6 +16,7 @@ device_id = cfg.get("audio_listener", {}).get("device_id", None)
 sample_rate = cfg.get("audio_listener", {}).get("sample_rate", 16000)
 channels = cfg.get("audio_listener", {}).get("channels", 1)
 frames_per_buffer = cfg.get("audio_listener", {}).get("frames_per_buffer", 1000)
+debug_mode = cfg.get("debug_mode", False)  
 
 # --- ADD THIS CONTEXT MANAGER ---
 @contextmanager
@@ -58,8 +59,11 @@ def define_device_id(pa:pyaudio.PyAudio = None, preferred:int = device_id, log:l
                     return i
 
 class AudioListener:
-    def __init__(self):
-        self.log = logging.getLogger("Audio_Listener")  
+    def __init__(self, log=None, debug = debug_mode):
+        self.log = log or logging.getLogger("Audio_Listener")  
+        level = logging.DEBUG if debug else logging.INFO
+        self.log.setLevel(level)
+
         self.sample_rate = sample_rate
         
         # --- UPDATE THIS BLOCK ---

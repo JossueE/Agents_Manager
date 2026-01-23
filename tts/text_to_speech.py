@@ -22,11 +22,14 @@ speed = cfg.get("tts", {}).get("speed", 1.0)
 path_to_save = cfg.get("tts", {}).get("path_to_save", "tts/audios")
 name_of_outs = cfg.get("tts", {}).get("name_of_outs", "test")
 save_wav = cfg.get("tts", {}).get("save_wav", False)
+debug_mode = cfg.get("debug_mode", False)   
 
 
 class TTS:
-    def __init__(self, model_path:str, model_path_conf:str):
-        self.log = logging.getLogger("TTS")
+    def __init__(self, model_path:str, model_path_conf:str, log=None, debug:bool=debug_mode):
+        self.log = log or logging.getLogger("TTS")
+        level = logging.DEBUG if debug else logging.INFO
+        self.log.setLevel(level)
         self.log.info("Loading Whisper TTS model...")
         self.log = logging.getLogger("TTS")
         self.voice = PiperVoice.load(model_path = model_path,config_path = model_path_conf )
@@ -54,6 +57,7 @@ class TTS:
     def synthesize(self, text: str):
         """Convert Text to Speech using Piper, return mono audio float32 [-1,1]"""
         if not text:
+            self.log.warning("No text provided for TTS synthesis")
             return None
         
         if save_wav:
@@ -62,6 +66,7 @@ class TTS:
                 self.voice.synthesize_wav(text, wav_file, syn_config=self.syn_config)
                 self.count_of_audios += 1
                 self.out_path = Path(path_to_save) / Path(name_of_outs) / Path(f"{name_of_outs}_{self.count_of_audios}.wav")
+            self.log.debug(f"The action for saving model was initialize. Check the path:{self.out_path}") if self.log.level == logging.DEBUG else None  
 
         mem = io.BytesIO()
         with wave.open(mem, "wb") as w:
@@ -137,11 +142,11 @@ class TTS:
 
     def stop_tts(self):
         """Stop the stream"""
-
         if self.stream is not None:
             self.stream.stop_stream()
             self.stream.close()
             self.stream = None
+
     def terminate(self):
         """ Call this when shutting down the whole app"""
         self.stop_tts()

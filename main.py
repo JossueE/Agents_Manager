@@ -20,22 +20,22 @@ path_general = cfg.get("fuzzy_search", {}).get("path_general", "config/data/gene
 voice = cfg.get("tts", {}).get("voice", 1)
 local_llm_path = Path(cfg.get("llm", {}).get("repo_path_local_llm", "~/Local-LLM")).expanduser().resolve()
 sys.path.insert(0, str(local_llm_path))
-
 agent_selector = cfg.get("llm", {}).get("agent_selector", "only_fuzzy")  # "local" or "internet" or "only_fuzzy"
+debug_mode = cfg.get("debug_mode", False)
 
 
 class OctybotAgent:
     def __init__(self):
         configure_logging() # <--- Initialize color logging
         self.log = logging.getLogger("System")
-        
+        self.level = logging.DEBUG if debug_mode else logging.INFO
+        self.log.setLevel(self.level)
         model = LoadModel()
         
         #Speech-to-Text
         self.audio_listener = AudioListener()
         self.wake_word = WakeWord(str(model.ensure_model("wake_word")[0]))
         self.stt = SpeechToText(str(model.ensure_model("stt")[1]), "small") #Other Model "base", id = 1
-        print(f"STT Model Loaded: {model.ensure_model('stt')[1]}")
         #Fuzzy Search for fuzzy_search
         self.diff = GENERAL_QA(path_general)
 
@@ -50,7 +50,9 @@ class OctybotAgent:
 
         if self.agent_selector == "local":
             from llm_main import LlmAgent
-            self.llm_agent = LlmAgent(model_path = str(model.ensure_model("llm")[0]), log = logging.getLogger("Local-Agent"))
+            local_llm_log = logging.getLogger("Local-Agent")
+            local_llm_log.setLevel(self.level) # ---------------------> This let us to pass the same debug mode to the llm agent
+            self.llm_agent = LlmAgent(model_path = str(model.ensure_model("llm")[0]), log = local_llm_log, debug=debug_mode)
             self.log.info("Local LLM Agent loaded successfully.") 
         
         elif self.agent_selector == "internet":

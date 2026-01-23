@@ -27,7 +27,7 @@ min_silence_ms_to_drain = cfg.get("stt", {}).get("min_silence_ms_to_drain", 100)
 listen_seconds = cfg.get("stt", {}).get("listen_seconds", 5)
 sample_rate = cfg.get("audio_listener", {}).get("sample_rate", 16000)
 channels = cfg.get("audio_listener", {}).get("channels", 1)
-
+debug_mode = cfg.get("debug_mode", False)
 
 # if AVATAR:
 #     import webbrowser, subprocess, sys
@@ -36,19 +36,15 @@ channels = cfg.get("audio_listener", {}).get("channels", 1)
 
 
 class WakeWord:
-    def __init__(self, model_path:str) -> None:
+    def __init__(self, model_path:str, log=None, debug:bool = debug_mode) -> None:
 
-        self.log = logging.getLogger("Wake_Word")     
+        self.log = log or logging.getLogger("Wake_Word")     
+        level = logging.DEBUG if debug else logging.INFO
+        self.log.setLevel(level)
         self.wake_word = activation_phrase
         self.listen_seconds = listen_seconds
         self.sample_rate = sample_rate
         self.variants = variants
-        
-        #State Machine 
-        # --- CHANGED FROM DEBUG TO INFO ---
-        self.on_say = (lambda s: self.log.info(f"{s}"))
-        # ----------------------------------
-
         grammar = json.dumps(self.variants, ensure_ascii=False)
         
         # --- SILENCE VOSK LOGS ---
@@ -93,6 +89,7 @@ class WakeWord:
             drained = self.buffer_add(frame)  
             if drained is not None:
                 # send_mode_sync(mode = "TTS", as_json=False) if AVATAR else None
+                self.log.debug("Max buffer size reached, draining buffer...")
                 return drained
         
         if not flag: # If I hear silence
@@ -102,9 +99,10 @@ class WakeWord:
                 self.partial_hits = 0
                 # send_mode_sync(mode = "TTS", as_json=False) if AVATAR else None
                 if self.listening_confirm and self.size > 0: # If the wake_word is confirm and something is in the buffer
+                    self.log.debug("Wake word and audio are confirm, Sending information...")
                     return self.buffer_drain()
-                self.on_say("Detection wasn't confirmed, clearing buffer...")
                 self.buffer_clear()
+                self.log.debug("clearing buffer...")
                 return
         
         if self.rec.AcceptWaveform(frame): 
@@ -132,7 +130,7 @@ class WakeWord:
                     self.partial_hits += 1
 
                     if self.partial_hits >= self.required_hits:
-                        self.log.info(f"Partial Match: {partial!r}")
+                        self.log.debug(f"Partial Match: {partial!r}")
                         self.partial_hits = 0
                         return
                 else:
@@ -146,7 +144,7 @@ class WakeWord:
         if self.size > self.max and self.listening_confirm:
             return self.buffer_drain()
         if self.size > self.max_2 and self.listening and not self.listening_confirm:
-            self.on_say("Límite de tiempo alcanzado sin confirmación, limpiando buffer")
+            self.log.debug("Detection wasn't confirmed, clearing buffer...")
             self.buffer_clear()
             # send_mode_sync(mode = "TTS", as_json=False) if AVATAR else None
         return None

@@ -19,16 +19,19 @@ sample_rate = cfg.get("stt", {}).get("sample_rate", 16000)
 self_vocabulary = cfg.get("stt", {}).get("self_vocabulary", None)
 no_speech_threshold = cfg.get("stt", {}).get("no_speech_threshold", 0.5)
 hallucination_silence_threshold = cfg.get("stt", {}).get("hallucination_silence_threshold", 0.3)
-
+debug_mode = cfg.get("debug_mode", False)
 
 class SpeechToText:
-    def __init__(self, model_path:str, model_name:str) -> None:
+    def __init__(self, model_path:str, model_name:str, log=None, debug:bool = debug_mode) -> None:
         
-        self.log = logging.getLogger("STT")    
+        self.log = log or logging.getLogger("STT")    
+        level = logging.DEBUG if debug else logging.INFO
+        self.log.setLevel(level)
 
         model_path = Path(model_path)
 
         self.model = whisper.load_model(model_name, download_root = model_path.parent, device=device_selector)
+        self.log.debug(f"Whisper STT model '{model_name}' loaded on device '{device_selector}'")
         
 
         # --- This patch is to avoid a bug from Whisper, it helps to catch commonly known hallucination outputs

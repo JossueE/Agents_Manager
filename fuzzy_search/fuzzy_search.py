@@ -15,16 +15,20 @@ with SETTINGS.open("r", encoding="utf-8") as f:
 fuzzy_logic_accuracy_general = cfg.get("fuzzy_search", {}).get("fuzzy_logic_accuracy_general", 0.70)
 path_general = cfg.get("fuzzy_search", {}).get("path_general", "config/data/general_QA.json")
 use_rapidfuzz = cfg.get("fuzzy_search", {}).get("use_rapidfuzz", True)
+debug_mode = cfg.get("debug_mode", False)
 
 class GENERAL_QA:
-    def __init__(self, path: str):
-        self.log = logging.getLogger("Diffuse_Search")
+    def __init__(self, path: str, log=None, debug:bool = debug_mode) -> None:
+        self.log = log or logging.getLogger("Diffuse_Search")           
+        level = logging.DEBUG if debug else logging.INFO
+        self.log.setLevel(level)
         self.items: List[Dict[str,str]] = []
         self.load(path)
+        self.log.info("GENERAL_QA initialized.")
     
     def load(self, path: str) -> None:
         """ Load the GENERAL_QA from a JSON file or line-separated JSON objects """
-        self.log.info("Loading GENERAL_QA...")
+        self.log.debug("Loading GENERAL_QA...")
         try:
             with open(path, "r", encoding="utf-8") as f:
                 txt = f.read().strip()
@@ -45,7 +49,7 @@ class GENERAL_QA:
                 elif isinstance(obj, list):
                     items = obj
                 self.items = items
-                self.log.info(f"Loaded {len(self.items)} fuzzy_search entries ")
+                self.log.debug(f"Loaded {len(self.items)} fuzzy_search entries ")
             except json.JSONDecodeError:
                 self.items = [json.loads(line) for line in txt.splitlines() if line.strip()]
                 self.log.warning("JSON format issue, attempted line-by-line load.")

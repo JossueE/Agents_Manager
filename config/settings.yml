@@ -8,6 +8,7 @@
 # --- Global Settings ---
 language: "es"                  # ISO code for the language (currently optimized for Spanish)
 models_path: "config/models.yml" # Path to the model definition file
+debug_mode: false              # Enable/Disable debug logging
 
 # --- Audio Listener (Microphone Input) ---
 audio_listener:
