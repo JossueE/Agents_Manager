@@ -17,6 +17,9 @@ It provides fast, robust approximate matching over a local knowledge base, with 
     View the full Pipeline
   </figcaption>
 </figure>
+<p align="right">
+  <a href="https://lucid.app/lucidchart/32124bf9-45bd-4607-8685-3a79c10533e3/view">Open in real size</a>
+</p>
 
 ---
 
